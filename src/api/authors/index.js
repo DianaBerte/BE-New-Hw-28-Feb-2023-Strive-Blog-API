@@ -6,8 +6,23 @@
 //3. GET (sg user) --> http://localhost:3001/authors/:userId => returns a single author
 
 import Express from "express";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
 const authorsRouter = Express.Router();
+
+// console.log("Current file path:", fileURLToPath(import.meta.url));
+// console.log("Parent's folder path:", dirname(fileURLToPath(import.meta.url)));
+// console.log(
+//   "Target:",
+//   join(dirname(fileURLToPath(import.meta.url)), "authors.json")
+// );
+
+const authorsJSONPath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "authors.json"
+);
 
 //1
 authorsRouter.post("/", (req, res) => {
@@ -18,17 +33,13 @@ authorsRouter.post("/", (req, res) => {
 //2
 authorsRouter.get("/", (req, res) => {
   //1 read content of authors.json
-  //2 send array of authors back as response
-  res.send([
-    {
-      name: "someName",
-      surname: "someSurname",
-      ID: "id",
-      email: "someEmail@gmail.com",
-      "date of birth": "01-01-1970",
-      avatar: "https://ui-avatars.com/api/?name=John+Doe",
-    },
-  ]);
+  const fileContentAsBuffer = fs.readFileSync(authorsJSONPath);
+
+  //2 convert buffer inot array
+  const authorsArray = JSON.parse(fileContentAsBuffer);
+
+  //3 send array of authors back as response
+  res.send(authorsArray);
 });
 
 //3
