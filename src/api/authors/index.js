@@ -34,18 +34,23 @@ console.log(
 //1
 authorsRouter.post("/", (req, res) => {
   //1 read request body
-  console.log("Request body:", req.body);
+  //   console.log("Request body:", req.body);
   //2 add some info
-  //3 save new author into author.json file
-  //4 send back a proper response
   const newAuthor = {
     ...req.body,
     createdAt: new Date(),
     updatedAt: new Date(),
     id: uniqid(),
   };
-  console.log("This is new author:", newAuthor);
-  res.send({ message: "I am the POST ENDPOINT" });
+  //3 save new author into author.json file
+  const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
+  authorsArray.push(newAuthor);
+  fs.writeFileSync(authorsJSONPath, JSON.stringify(authorsArray));
+  //4 send back a proper response
+  res.status(201).send({ id: newAuthor.id });
+
+  //   console.log("This is new author:", newAuthor);
+  //   res.send({ message: "I am the POST ENDPOINT" });
 });
 
 //2
