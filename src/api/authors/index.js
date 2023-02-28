@@ -73,7 +73,18 @@ authorsRouter.get("/:userId", (req, res) => {
 });
 
 //4
-authorsRouter.put("/:userId", (req, res) => {});
+authorsRouter.put("/:userId", (req, res) => {
+  const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
+  const index = authorsArray.findIndex(
+    (author) => author.id === req.params.userId
+  );
+  const oldAuthor = authorsArray[index];
+  const updatedAuthor = { ...oldAuthor, ...req.body, updatedAt: new Date() };
+  authorsArray[index] = updatedAuthor;
+
+  fs.writeFileSync(authorsJSONPath, JSON.stringify(authorsArray));
+  res.send(updatedAuthor);
+});
 
 //5
 authorsRouter.delete("/:userId", (req, res) => {
