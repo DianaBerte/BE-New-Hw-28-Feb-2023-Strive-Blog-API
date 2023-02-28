@@ -66,7 +66,11 @@ authorsRouter.get("/", (req, res) => {
 });
 
 //3
-authorsRouter.get("/:userId", (req, res) => {});
+authorsRouter.get("/:userId", (req, res) => {
+  const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
+  const author = authorsArray.find((author) => author.id === req.params.userId);
+  res.send(author);
+});
 
 //4
 authorsRouter.put("/:userId", (req, res) => {});
