@@ -11,6 +11,7 @@ import Express from "express";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import uniqid from "uniqid";
 
 const authorsRouter = Express.Router();
 
@@ -25,11 +26,26 @@ const authorsJSONPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "authors.json"
 );
+console.log(
+  "TARGET:",
+  join(dirname(fileURLToPath(import.meta.url)), "users.json")
+);
 
 //1
 authorsRouter.post("/", (req, res) => {
-  //   res.send({ message: "Hello I'm the POST ENDPOINT" });
-  // const newAuthor = {...req.body, createdAt: new Date(), updatedAt: new Date(), id: uniqid()}
+  //1 read request body
+  console.log("Request body:", req.body);
+  //2 add some info
+  //3 save new author into author.json file
+  //4 send back a proper response
+  const newAuthor = {
+    ...req.body,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    id: uniqid(),
+  };
+  console.log("This is new author:", newAuthor);
+  res.send({ message: "I am the POST ENDPOINT" });
 });
 
 //2
