@@ -4,6 +4,8 @@
 //1. POST --> http://localhost:3001/authors/ => (+ body) create a new author
 //2. GET --> http://localhost:3001/authors/ => returns the list of authors
 //3. GET (sg user) --> http://localhost:3001/authors/:userId => returns a single author
+//4. PUT --> http://localhost:3001/authors/:userId => edit the author with the given id
+//5. DELETE --> http://localhost:3001/authors/:userId => delete the author with the given id
 
 import Express from "express";
 import fs from "fs";
@@ -26,7 +28,7 @@ const authorsJSONPath = join(
 
 //1
 authorsRouter.post("/", (req, res) => {
-  res.send({ message: "Hello I'm the POST ENDPOINT" });
+  //   res.send({ message: "Hello I'm the POST ENDPOINT" });
   // const newAuthor = {...req.body, createdAt: new Date(), updatedAt: new Date(), id: uniqid()}
 });
 
@@ -43,6 +45,12 @@ authorsRouter.get("/", (req, res) => {
 });
 
 //3
-authorsRouter.get("/:userId", () => {});
+authorsRouter.get("/:userId", (req, res) => {});
+
+//4
+authorsRouter.put("/:userId", (req, res) => {});
+
+//5
+authorsRouter.delete("/:userId", (req, res) => {});
 
 export default authorsRouter;
