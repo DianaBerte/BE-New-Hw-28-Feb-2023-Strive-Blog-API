@@ -61,7 +61,34 @@ blogPostsRouter.get("/:blogpostId", (req, res, next) => {
 });
 
 //4. PUT
-blogPostsRouter.put("/:blogpostId", (req, res) => {});
+blogPostsRouter.put("/:blogpostId", (req, res, next) => {
+  try {
+    const blogPostsArray = getBlogPosts();
+    const index = blogPostsArray.findIndex(
+      (blogPost) => blogPost.id === req.params.blogpostId
+    );
+    if (index !== -1) {
+      const oldBlogPost = blogPostsArray[index];
+      const updatedBlogPost = {
+        ...oldBlogPost,
+        ...req.body,
+        updatedAt: new Date(),
+      };
+      blogPostsArray[index] = updatedBlogPost;
+      writeBlogPosts(blogPostsArray);
+      res.send(updatedBlogPost);
+    } else {
+      next(
+        createHttpError(
+          404,
+          `Blog post with id ${req.params.blogpostId} is not found!`
+        )
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 //5. DELETE
 blogPostsRouter.delete("/:blogpostId", (req, res) => {});
