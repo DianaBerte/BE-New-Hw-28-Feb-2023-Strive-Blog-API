@@ -51,7 +51,7 @@ blogPostsRouter.get("/:blogpostId", (req, res, next) => {
       next(
         createHttpError(
           404,
-          `Blog post with id ${req.params.blogpostId} not found!`
+          `Blog post with id ${req.params.blogpostId} was not found!`
         )
       );
     }
@@ -91,6 +91,26 @@ blogPostsRouter.put("/:blogpostId", (req, res, next) => {
 });
 
 //5. DELETE
-blogPostsRouter.delete("/:blogpostId", (req, res) => {});
+blogPostsRouter.delete("/:blogpostId", (req, res, next) => {
+  try {
+    const blogPostsArray = getBlogPosts();
+    const remainingBlogPosts = blogPostsArray.filter(
+      (blogPost) => blogPost.id !== req.params.blogpostId
+    );
+    if (blogPostsArray.length !== remainingBlogPosts.length) {
+      writeBlogPosts(remainingBlogPosts);
+      res.status(204).send();
+    } else {
+      next(
+        createHttpError(
+          404,
+          `Blog post with id ${req.params.blogpostId} was not found!`
+        )
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default blogPostsRouter;
