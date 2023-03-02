@@ -16,10 +16,7 @@ const blogPostsRouter = Express.Router();
 //1. POST
 blogPostsRouter.post("/", (req, res) => {
   const newBlogPost = {
-    ...req.body,
-    id: uniqid(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    ...req.body, id: uniqid(), createdAt: new Date(), updatedAt: new Date(),
   };
 
   const blogPostsArray = getBlogPosts();
@@ -30,8 +27,8 @@ blogPostsRouter.post("/", (req, res) => {
 });
 
 //2. GET
-blogPostsRouter.get("/", (req, res) => {
-  const blogPosts = getBlogPosts();
+blogPostsRouter.get("/", async (req, res) => {
+  const blogPosts = await getBlogPosts();
   res.send(blogPosts);
 });
 
