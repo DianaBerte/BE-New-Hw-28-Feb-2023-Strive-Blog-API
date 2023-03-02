@@ -14,12 +14,12 @@ const blogPostsRouter = Express.Router();
 // const writeBlogPosts = (blogPostsArray) => fs.writeFileSync(blogpostsJSONPath, JSON.stringify(blogPostsArray));
 
 //1. POST
-blogPostsRouter.post("/", (req, res) => {
+blogPostsRouter.post("/", async (req, res) => {
   const newBlogPost = {
     ...req.body, id: uniqid(), createdAt: new Date(), updatedAt: new Date(),
   };
 
-  const blogPostsArray = getBlogPosts();
+  const blogPostsArray = await getBlogPosts();
   blogPostsArray.push(newBlogPost);
   writeBlogPosts(blogPostsArray);
 
@@ -33,9 +33,9 @@ blogPostsRouter.get("/", async (req, res) => {
 });
 
 //3. GET WITH ID
-blogPostsRouter.get("/:blogpostId", (req, res, next) => {
+blogPostsRouter.get("/:blogpostId", async (req, res, next) => {
   try {
-    const blogPostsArray = getBlogPosts();
+    const blogPostsArray = await getBlogPosts();
     const foundBlogPost = blogPostsArray.find(
       (blogPost) => blogPost.id === req.params.blogpostId
     );
@@ -55,9 +55,9 @@ blogPostsRouter.get("/:blogpostId", (req, res, next) => {
 });
 
 //4. PUT
-blogPostsRouter.put("/:blogpostId", (req, res, next) => {
+blogPostsRouter.put("/:blogpostId", async (req, res, next) => {
   try {
-    const blogPostsArray = getBlogPosts();
+    const blogPostsArray = await getBlogPosts();
     const index = blogPostsArray.findIndex(
       (blogPost) => blogPost.id === req.params.blogpostId
     );
@@ -85,9 +85,9 @@ blogPostsRouter.put("/:blogpostId", (req, res, next) => {
 });
 
 //5. DELETE
-blogPostsRouter.delete("/:blogpostId", (req, res, next) => {
+blogPostsRouter.delete("/:blogpostId", async (req, res, next) => {
   try {
-    const blogPostsArray = getBlogPosts();
+    const blogPostsArray = await getBlogPosts();
     const remainingBlogPosts = blogPostsArray.filter(
       (blogPost) => blogPost.id !== req.params.blogpostId
     );

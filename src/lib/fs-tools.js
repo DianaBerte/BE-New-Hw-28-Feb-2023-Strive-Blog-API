@@ -9,3 +9,4 @@ const blogpostsJSONPath = join(dataFolderPath, "blogposts.jSON")
 // console.log("DATA FOLDER:", dataFolderPath)
 export const getBlogPosts = () => readJSON(blogpostsJSONPath);
 export const writeBlogPosts = blogPostsArray => writeJSON(blogpostsJSONPath, blogPostsArray);
+
