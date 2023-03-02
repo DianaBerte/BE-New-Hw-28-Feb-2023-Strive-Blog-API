@@ -1,11 +1,10 @@
-//****** authors related endpoints ********/
-//****authors CRUD endpoints******/
-
 //1. POST --> http://localhost:3001/authors/ => (+ body) create a new author
 //2. GET --> http://localhost:3001/authors/ => returns the list of authors
 //3. GET (sg user) --> http://localhost:3001/authors/:userId => returns a single author
 //4. PUT --> http://localhost:3001/authors/:userId => edit the author with the given id
 //5. DELETE --> http://localhost:3001/authors/:userId => delete the author with the given id
+
+//POST /authors/:id/uploadAvatar, uploads a picture (save as idOfTheAuthor.jpg in the public/img/authors folder) for the author specified by the id. Store the newly created URL into the corresponding author in authors.json
 
 import Express from "express";
 import fs from "fs";
@@ -16,12 +15,6 @@ import { getBlogPosts } from "../../lib/fs-tools.js";
 
 const authorsRouter = Express.Router();
 
-// console.log("Current file path:", fileURLToPath(import.meta.url));
-// console.log("Parent's folder path:", dirname(fileURLToPath(import.meta.url)));
-// console.log(
-//   "Target:",
-//   join(dirname(fileURLToPath(import.meta.url)), "authors.json")
-// );
 
 const authorsJSONPath = join(
   dirname(fileURLToPath(import.meta.url)),

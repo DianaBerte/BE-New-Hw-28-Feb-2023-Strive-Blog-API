@@ -6,7 +6,6 @@ import uniqid from "uniqid";
 import createHttpError from "http-errors";
 import { getBlogPosts, writeBlogPosts } from "../../lib/fs-tools.js";
 
-
 const blogPostsRouter = Express.Router();
 
 // const blogpostsJSONPath = join(dirname(fileURLToPath(import.meta.url)), "blogPosts.json");
@@ -18,11 +17,9 @@ blogPostsRouter.post("/", async (req, res) => {
   const newBlogPost = {
     ...req.body, id: uniqid(), createdAt: new Date(), updatedAt: new Date(),
   };
-
   const blogPostsArray = await getBlogPosts();
   blogPostsArray.push(newBlogPost);
   writeBlogPosts(blogPostsArray);
-
   res.status(201).send({ id: newBlogPost.id });
 });
 
