@@ -1,20 +1,17 @@
+// import fs from "fs";
+// import { fileURLToPath } from "url";
+// import { dirname, join } from "path";
 import Express from "express";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
 import uniqid from "uniqid";
 import createHttpError from "http-errors";
+import { getBlogPosts, writeBlogPosts } from "../../lib/fs-tools.js";
+
 
 const blogPostsRouter = Express.Router();
 
-const blogpostsJSONPath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "blogPosts.json"
-);
-
-const getBlogPosts = () => JSON.parse(fs.readFileSync(blogpostsJSONPath));
-const writeBlogPosts = (blogPostsArray) =>
-  fs.writeFileSync(blogpostsJSONPath, JSON.stringify(blogPostsArray));
+// const blogpostsJSONPath = join(dirname(fileURLToPath(import.meta.url)), "blogPosts.json");
+// const getBlogPosts = () => JSON.parse(fs.readFileSync(blogpostsJSONPath));
+// const writeBlogPosts = (blogPostsArray) => fs.writeFileSync(blogpostsJSONPath, JSON.stringify(blogPostsArray));
 
 //1. POST
 blogPostsRouter.post("/", (req, res) => {

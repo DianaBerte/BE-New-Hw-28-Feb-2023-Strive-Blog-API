@@ -12,6 +12,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import uniqid from "uniqid";
+import { getBlogPosts } from "../../lib/fs-tools.js";
 
 const authorsRouter = Express.Router();
 
