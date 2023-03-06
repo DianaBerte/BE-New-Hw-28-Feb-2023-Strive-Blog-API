@@ -17,7 +17,7 @@ filesRouter.post("/:id/single",
     cloudinaryUploader,
     async (req, res, next) => {
         try {
-            console.log('FILE:', req.file);
+            console.log('FILE:', req.file.path);
             // const originalFileExtension = extname(req.file.originalname);
             // const coverName = req.params.id + originalFileExtension;
             // await saveBlogPostsCovers(coverName, req.file.buffer)
