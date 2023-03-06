@@ -6,6 +6,7 @@ import cors from "cors";
 import { genericErrorHandler } from "./api/errorsHandlers.js";
 import filesRouter from "./files/index.js";
 import createHttpError from "http-errors";
+import { join } from 'path';
 
 const server = Express();
 const port = process.env.PORT || 3004
