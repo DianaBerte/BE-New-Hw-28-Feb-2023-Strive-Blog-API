@@ -5,32 +5,30 @@ import blogPostsRouter from "./api/blog_posts/index.js";
 import cors from "cors";
 import { genericErrorHandler } from "./api/errorsHandlers.js";
 import filesRouter from "./files/index.js";
-
+import createHttpError from "http-errors";
 
 const server = Express();
 const port = process.env.PORT || 3004
 
 // console.log("Hello:", process.env.MONGO_URL)
 
-server.use(Express.json());
-server.use(cors());
-
 //*****************************************cors*****************************************/
 
 const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
 
 // server.use(Express.static(publicFolderPath))
-// server.use(
-//   cors({
-//     origin: (currentOrigin, corsNext) => {
-//       if (!currentOrigin || whitelist.indexOf(currentOrigin) !== -1) {
-//         corsNext(null, true)
-//       } else {
-//         corsNext(create)
-//       }
-//     }
-//   })
-// )
+server.use(
+  cors({
+    origin: (currentOrigin, corsNext) => {
+      if (!currentOrigin || whitelist.indexOf(currentOrigin) !== -1) {
+        corsNext(null, true)
+      } else {
+        corsNext(createHttpError(400, `Origin ${currentOrigin} is not in the whitelist!`))
+      }
+    }
+  })
+)
+server.use(Express.json());
 
 //******************************************endpoints*****************************************/
 server.use("/authors", authorsRouter);
