@@ -9,6 +9,7 @@ import createHttpError from "http-errors";
 
 const server = Express();
 const port = process.env.PORT || 3004
+const publicFolderPath = join(process.cwd(), "./public")
 
 // console.log("Hello:", process.env.MONGO_URL)
 
@@ -16,7 +17,7 @@ const port = process.env.PORT || 3004
 
 const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
 
-// server.use(Express.static(publicFolderPath))
+server.use(Express.static(publicFolderPath))
 server.use(
   cors({
     origin: (currentOrigin, corsNext) => {
