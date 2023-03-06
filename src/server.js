@@ -7,7 +7,9 @@ import { genericErrorHandler } from "./api/errorsHandlers.js";
 import filesRouter from "./files/index.js";
 
 const server = Express();
-const port = 3004;
+const port = process.env.PORT
+
+console.log("Hellooo:", process.env.MONGO_URL)
 
 server.use(Express.json());
 server.use(cors());
