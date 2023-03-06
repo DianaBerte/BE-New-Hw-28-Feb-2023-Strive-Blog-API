@@ -6,20 +6,38 @@ import cors from "cors";
 import { genericErrorHandler } from "./api/errorsHandlers.js";
 import filesRouter from "./files/index.js";
 
-const server = Express();
-const port = process.env.PORT
 
-console.log("Hellooo:", process.env.MONGO_URL)
+const server = Express();
+const port = process.env.PORT || 3004
+
+// console.log("Hello:", process.env.MONGO_URL)
 
 server.use(Express.json());
 server.use(cors());
 
-//*********endpoints******/
+//*****************************************cors*****************************************/
+
+const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
+
+// server.use(Express.static(publicFolderPath))
+// server.use(
+//   cors({
+//     origin: (currentOrigin, corsNext) => {
+//       if (!currentOrigin || whitelist.indexOf(currentOrigin) !== -1) {
+//         corsNext(null, true)
+//       } else {
+//         corsNext(create)
+//       }
+//     }
+//   })
+// )
+
+//******************************************endpoints*****************************************/
 server.use("/authors", authorsRouter);
 server.use("/blogposts", blogPostsRouter);
 server.use("/files", filesRouter)
 
-//****************error handlers*************/
+//*******************************************error handlers*********************************************/
 server.use(genericErrorHandler);
 
 server.listen(port, () => {
