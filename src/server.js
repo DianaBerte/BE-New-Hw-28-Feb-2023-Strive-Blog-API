@@ -22,6 +22,7 @@ server.use(Express.static(publicFolderPath))
 server.use(
   cors({
     origin: (currentOrigin, corsNext) => {
+      console.log("Current origin:", currentOrigin)
       if (!currentOrigin || whitelist.indexOf(currentOrigin) !== -1) {
         corsNext(null, true)
       } else {
