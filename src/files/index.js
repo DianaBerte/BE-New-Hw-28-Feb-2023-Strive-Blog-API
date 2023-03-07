@@ -30,16 +30,18 @@ filesRouter.post("/:id/single",
         }
     })
 
-filesRouter.get("/pdf", async (req, res, next) => {
+filesRouter.get("/:blogPostsId/pdf", async (req, res, next) => { //REMEMBER we're in FILES ROUTER so the url needs to be http://localhost:3004/files/1vhd9gglepyxc23/pdf
     try {
-        req.setHeader("Content-Disposition", "attachment; filename=homework.pdf")
         const blogPosts = await getBlogPosts()
-        const source = getPDFReadableStream(blogPosts[0])
-        const destination = res
-
-        pipeline(source, destination, err => {
-            if (err) console.log(err)
-        })
+        const foundBlogPost = blogPosts.find((b) => b.id === req.params.blogPostsId)
+        if (foundBlogPost) {
+            res.setHeader("Content-Disposition", `attachment; filename=${foundBlogPost.id}.pdf`)
+            const source = await getPDFReadableStream(foundBlogPost)
+            const destination = res;
+            pipeline(source, destination, (err) => {
+                if (err) console.log(err)
+            })
+        }
     } catch (error) {
         next(error)
     }

@@ -1,6 +1,6 @@
 import PdfPrinter from "pdfmake";
 
-export const getPDFReadableStream = blogPost => {
+export const getPDFReadableStream = (blogPost) => {
     const fonts = {
         Helvetica: {
             normal: "Helvetica",
@@ -12,8 +12,7 @@ export const getPDFReadableStream = blogPost => {
     const printer = new PdfPrinter(fonts)
 
     const docDefinition = {
-        content: ["test test test"],
-        // [blogPost.title, blogPost.content],
+        content: [blogPost.title, blogPost.content],
         defaultStyle: {
             font: "Helvetica",
         }
