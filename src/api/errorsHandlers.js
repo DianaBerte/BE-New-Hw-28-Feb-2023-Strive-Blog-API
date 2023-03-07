@@ -2,5 +2,5 @@
 
 export const genericErrorHandler = (err, req, res, next) => {
   console.log("ERROR:", err);
-  res.status(500).send({ message: "Error hapened, will fix ASAP" });
+  res.status(500).send({ message: "Error happened, will fix ASAP" });
 };
