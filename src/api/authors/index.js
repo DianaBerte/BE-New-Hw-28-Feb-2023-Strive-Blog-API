@@ -11,7 +11,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import uniqid from "uniqid";
-import { getBlogPosts } from "../../lib/fs-tools.js";
+import { getAuthors, writeAuthors } from "../../lib/fs-tools.js";
 
 const authorsRouter = Express.Router();
 
@@ -48,16 +48,22 @@ authorsRouter.post("/", (req, res) => {
 });
 
 //2
-authorsRouter.get("/", (req, res) => {
-  //1 read content of authors.json
-  const fileContentAsBuffer = fs.readFileSync(authorsJSONPath);
+// authorsRouter.get("/", (req, res) => {
+//   //1 read content of authors.json
+//   const fileContentAsBuffer = fs.readFileSync(authorsJSONPath);
 
-  //2 convert buffer inot array
-  const authorsArray = JSON.parse(fileContentAsBuffer);
+//   //2 convert buffer inot array
+//   const authorsArray = JSON.parse(fileContentAsBuffer);
 
-  //3 send array of authors back as response
-  res.send(authorsArray);
-});
+//   //3 send array of authors back as response
+//   res.send(authorsArray);
+// });
+
+//refactoring GET
+authorsRouter.get("/", async (req, res) => {
+  const authors = await getAuthors();
+  res.send(authors)
+})
 
 //3
 authorsRouter.get("/:userId", (req, res) => {
