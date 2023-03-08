@@ -1,5 +1,5 @@
 {
-  "name": "new-hw-28-feb-2023-strive-blog-api",
+  "name": "be-new-hw-28-feb-2023-strive-blog-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DianaBerte/New-Hw-28-Feb-2023-Strive-Blog-API.git"
+    "url": "git+https://github.com/DianaBerte/BE-New-Hw-28-Feb-2023-Strive-Blog-API.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/DianaBerte/New-Hw-28-Feb-2023-Strive-Blog-API/issues"
+    "url": "https://github.com/DianaBerte/BE-New-Hw-28-Feb-2023-Strive-Blog-API/issues"
   },
-  "homepage": "https://github.com/DianaBerte/New-Hw-28-Feb-2023-Strive-Blog-API#readme",
+  "homepage": "https://github.com/DianaBerte/BE-New-Hw-28-Feb-2023-Strive-Blog-API#readme",
   "dependencies": {
     "cloudinary": "^1.35.0",
     "cors": "^2.8.5",
