@@ -21,7 +21,7 @@ const authorsJSONPath = join(
   "authors.json"
 );
 console.log(
-  "TARGET:",
+  "Target:",
   join(dirname(fileURLToPath(import.meta.url)), "users.json")
 );
 
