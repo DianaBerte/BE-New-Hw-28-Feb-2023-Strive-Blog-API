@@ -6,6 +6,9 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { v2 as cloudinary } from "cloudinary";
 import { getPDFReadableStream } from "../lib/pdf-tools.js";
 import { pipeline } from "stream";
+import { Transform } from "@json2csv/node";
+import { getBlogPostsJSONReadableStream } from "../lib/fs-tools.js";
+import { createGzip } from "zlib";
 
 //POST /blogPosts/:id/uploadCover, uploads a picture (save as idOfTheBlogPost.jpg in the public/img/blogPosts folder) for the blog post specified by the id. Store the newly created URL into the corresponding post in blogPosts.json
 
@@ -42,6 +45,21 @@ filesRouter.get("/:blogPostsId/pdf", async (req, res, next) => { //REMEMBER we'r
                 if (err) console.log(err)
             })
         }
+    } catch (error) {
+        next(error)
+    }
+})
+
+//endpoint for exporting a CSV file for blog posts
+filesRouter.get("/blogPostsCSV", (req, res, next) => {
+    try {
+        setHeader("Content-Disposition", "attachment; filename=blogPosts.csv")
+        const source = getBlogPostsJSONReadableStream()
+        const transform = new Transform({ fields: ["category", "title", "content", "id"] })
+        const destination = res
+        pipeline(source, transform, destination, err => {
+            if (err) console.log(err)
+        })
     } catch (error) {
         next(error)
     }

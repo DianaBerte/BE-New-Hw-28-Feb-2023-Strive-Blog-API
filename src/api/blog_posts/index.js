@@ -5,6 +5,7 @@ import Express from "express";
 import uniqid from "uniqid";
 import createHttpError from "http-errors";
 import { getBlogPosts, writeBlogPosts, getBlogPostsJSONReadableStream } from "../../lib/fs-tools.js";
+import { Transform } from "@json2csv/node";
 
 const blogPostsRouter = Express.Router();
 
@@ -105,18 +106,18 @@ blogPostsRouter.delete("/:blogpostId", async (req, res, next) => {
 });
 
 //endpoint for exporting a CSV file for blog posts
-blogPostsRouter.get("/csv", (req, res, next) => {
-  try {
-    setHeader("Content-Disposition", "attachment; filename=blogPosts.csv")
-    const source = getBlogPostsJSONReadableStream()
-    const transform = new Transform({ fields: ["category", "title", "content", "id"] })
-    const destination = res
-    pipeline(source, transform, destination, err => {
-      if (err) console.log(err)
-    })
-  } catch (error) {
-    next(error)
-  }
-})
+// blogPostsRouter.get("/blogPostsCSV", (req, res, next) => {
+//   try {
+//     setHeader("Content-Disposition", "attachment; filename=blogPosts.csv")
+//     const source = getBlogPostsJSONReadableStream()
+//     const transform = new Transform({ fields: ["category", "title", "content", "id"] })
+//     const destination = res
+//     pipeline(source, transform, destination, err => {
+//       if (err) console.log(err)
+//     })
+//   } catch (error) {
+//     next(error)
+//   }
+// })
 
 export default blogPostsRouter;
