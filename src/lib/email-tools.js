@@ -8,7 +8,7 @@ export const sendsRegistrationEmail = async recipientAdress => {
         from: process.env.SENDER_EMAIL_ADDRESS,
         subject: "First email sent!",
         text: "Hello, this is a test",
-        html: "<strong>first test</strong>",
+        html: "Yay, this is working!",
     }
     await sgMail.send(msg)
 }
