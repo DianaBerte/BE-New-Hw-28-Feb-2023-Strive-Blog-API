@@ -53,7 +53,7 @@ filesRouter.get("/:blogPostsId/pdf", async (req, res, next) => { //REMEMBER we'r
 //endpoint for exporting a CSV file for blog posts
 filesRouter.get("/blogPostsCSV", (req, res, next) => {
     try {
-        setHeader("Content-Disposition", "attachment; filename=blogPosts.csv")
+        res.setHeader("Content-Disposition", "attachment; filename=blogPosts.csv")
         const source = getBlogPostsJSONReadableStream()
         const transform = new Transform({ fields: ["category", "title", "content", "id"] })
         const destination = res
