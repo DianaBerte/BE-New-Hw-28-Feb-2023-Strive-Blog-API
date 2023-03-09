@@ -12,6 +12,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import uniqid from "uniqid";
 import { getAuthors, writeAuthors } from "../../lib/fs-tools.js";
+import { sendsRegistrationEmail } from "../../lib/email-tools.js";
 
 const authorsRouter = Express.Router();
 
@@ -95,5 +96,15 @@ authorsRouter.delete("/:userId", (req, res) => {
   fs.writeFileSync(authorsJSONPath, JSON.stringify(remainingAuthors));
   res.status(204).send();
 });
+
+authorsRouter.post("/register", async (req, res, next) => {
+  try {
+    const { email } = req.body
+    await sendsRegistrationEmail(email)
+    res.send()
+  } catch (error) {
+    next(error)
+  }
+})
 
 export default authorsRouter;
