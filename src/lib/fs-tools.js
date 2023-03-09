@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { createReadStream } from "fs";
 
 const { readJSON, writeJSON, writeFile } = fs;
 
@@ -17,3 +18,4 @@ export const writeAuthors = authorsArray => writeJSON(authorsJSONPath, authorsAr
 
 export const saveBlogPostsCovers = (filename, fileContentAsBuffer) => writeFile(join(blogPostsPublicFolderPath, filename), fileContentAsBuffer)
 
+export const getBlogPostsJSONReadableStream = () => createReadStream(blogpostsJSONPath)
