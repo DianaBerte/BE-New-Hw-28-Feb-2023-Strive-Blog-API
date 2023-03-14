@@ -6,6 +6,7 @@ import uniqid from "uniqid";
 import createHttpError from "http-errors";
 import { getBlogPosts, writeBlogPosts, getBlogPostsJSONReadableStream } from "../../lib/fs-tools.js";
 import { Transform } from "@json2csv/node";
+import blogPostsModel from "./model.js";
 
 const blogPostsRouter = Express.Router();
 
@@ -13,16 +14,27 @@ const blogPostsRouter = Express.Router();
 // const getBlogPosts = () => JSON.parse(fs.readFileSync(blogpostsJSONPath));
 // const writeBlogPosts = (blogPostsArray) => fs.writeFileSync(blogpostsJSONPath, JSON.stringify(blogPostsArray));
 
-//1. POST
-blogPostsRouter.post("/", async (req, res) => {
-  const newBlogPost = {
-    ...req.body, id: uniqid(), createdAt: new Date(), updatedAt: new Date(),
-  };
-  const blogPostsArray = await getBlogPosts();
-  blogPostsArray.push(newBlogPost);
-  writeBlogPosts(blogPostsArray);
-  res.status(201).send({ id: newBlogPost.id });
-});
+//1. POST the old way
+// blogPostsRouter.post("/", async (req, res) => {
+//   const newBlogPost = {
+//     ...req.body, id: uniqid(), createdAt: new Date(), updatedAt: new Date(),
+//   };
+//   const blogPostsArray = await getBlogPosts();
+//   blogPostsArray.push(newBlogPost);
+//   writeBlogPosts(blogPostsArray);
+//   res.status(201).send({ id: newBlogPost.id });
+// });
+
+//1. POST the MONGO way
+blogPostsRouter.post("/", async (req, res, next) => {
+  try {
+    const newBlogPost = new blogPostsModel(req.body)
+    const { _id } = await newBlogPost.save()
+    res.status(201).send({ _id })
+  } catch (error) {
+    next(error)
+  }
+})
 
 //2. GET
 blogPostsRouter.get("/", async (req, res) => {
@@ -30,27 +42,41 @@ blogPostsRouter.get("/", async (req, res) => {
   res.send(blogPosts);
 });
 
-//3. GET WITH ID
-blogPostsRouter.get("/:blogpostId", async (req, res, next) => {
+//3. GET WITH ID the lod way
+// blogPostsRouter.get("/:blogpostId", async (req, res, next) => {
+//   try {
+//     const blogPostsArray = await getBlogPosts();
+//     const foundBlogPost = blogPostsArray.find(
+//       (blogPost) => blogPost.id === req.params.blogpostId
+//     );
+//     if (foundBlogPost) {
+//       res.send(foundBlogPost);
+//     } else {
+//       next(
+//         createHttpError(
+//           404,
+//           `Blog post with id ${req.params.blogpostId} was not found!`
+//         )
+//       );
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+//3. GET WITH ID the MONGO way
+blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   try {
-    const blogPostsArray = await getBlogPosts();
-    const foundBlogPost = blogPostsArray.find(
-      (blogPost) => blogPost.id === req.params.blogpostId
-    );
-    if (foundBlogPost) {
-      res.send(foundBlogPost);
+    const blogPost = await blogPostsModel.findById(req.params.blogPostId)
+    if (blogPost) {
+      res.send(blogPost)
     } else {
-      next(
-        createHttpError(
-          404,
-          `Blog post with id ${req.params.blogpostId} was not found!`
-        )
-      );
+      next(createHttpError(404, `Blog post with id ${req.params.blogPostId} not found :(`))
     }
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 //4. PUT
 blogPostsRouter.put("/:blogpostId", async (req, res, next) => {
