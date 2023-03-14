@@ -44,8 +44,8 @@ server.use(genericErrorHandler);
 
 mongoose.connect(process.env.MONGO_URL)
 
-mongoose.connection.on("Connected", () => {
-  console.log("Successfully connected to Mongo!")
+mongoose.connection.on("connected", () => {
+  console.log("Successfully connected to MONGO!")
   server.listen(port, () => {
     console.table(listEndpoints(server));
     console.log(`The server is running on port ${port}`);
