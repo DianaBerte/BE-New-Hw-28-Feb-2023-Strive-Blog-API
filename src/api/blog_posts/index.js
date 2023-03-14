@@ -36,11 +36,21 @@ blogPostsRouter.post("/", async (req, res, next) => {
   }
 })
 
-//2. GET
-blogPostsRouter.get("/", async (req, res) => {
-  const blogPosts = await getBlogPosts();
-  res.send(blogPosts);
-});
+//2. GET the old way
+// blogPostsRouter.get("/", async (req, res) => {
+//   const blogPosts = await getBlogPosts();
+//   res.send(blogPosts);
+// });
+
+//2. GET the MONGO way
+blogPostsRouter.get("/", async (req, res, next) => {
+  try {
+    const blogPosts = await blogPostsModel.find()
+    res.send(blogPosts)
+  } catch (error) {
+    next(error)
+  }
+})
 
 //3. GET WITH ID the lod way
 // blogPostsRouter.get("/:blogpostId", async (req, res, next) => {
@@ -78,35 +88,53 @@ blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   }
 })
 
-//4. PUT
-blogPostsRouter.put("/:blogpostId", async (req, res, next) => {
+//4. PUT the old way
+// blogPostsRouter.put("/:blogpostId", async (req, res, next) => {
+//   try {
+//     const blogPostsArray = await getBlogPosts();
+//     const index = blogPostsArray.findIndex(
+//       (blogPost) => blogPost.id === req.params.blogpostId
+//     );
+//     if (index !== -1) {
+//       const oldBlogPost = blogPostsArray[index];
+//       const updatedBlogPost = {
+//         ...oldBlogPost,
+//         ...req.body,
+//         updatedAt: new Date(),
+//       };
+//       blogPostsArray[index] = updatedBlogPost;
+//       writeBlogPosts(blogPostsArray);
+//       res.send(updatedBlogPost);
+//     } else {
+//       next(
+//         createHttpError(
+//           404,
+//           `Blog post with id ${req.params.blogpostId} is not found!`
+//         )
+//       );
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+//4. PUT the MONGO way
+blogPostsRouter.put("/:blogPostId", async (req, res, next) => {
   try {
-    const blogPostsArray = await getBlogPosts();
-    const index = blogPostsArray.findIndex(
-      (blogPost) => blogPost.id === req.params.blogpostId
-    );
-    if (index !== -1) {
-      const oldBlogPost = blogPostsArray[index];
-      const updatedBlogPost = {
-        ...oldBlogPost,
-        ...req.body,
-        updatedAt: new Date(),
-      };
-      blogPostsArray[index] = updatedBlogPost;
-      writeBlogPosts(blogPostsArray);
-      res.send(updatedBlogPost);
+    const updatedBlogPost = await blogPostsModel.findByIdAndUpdate(
+      req.params.blogPostId,
+      req.body,
+      { new: true, runValidators: true }
+    )
+    if (updatedBlogPost) {
+      res.send(updatedBlogPost)
     } else {
-      next(
-        createHttpError(
-          404,
-          `Blog post with id ${req.params.blogpostId} is not found!`
-        )
-      );
+      next(createHttpError(404, `Blog post with id ${req.params.blogPostId} not found :(`))
     }
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 //5. DELETE
 blogPostsRouter.delete("/:blogpostId", async (req, res, next) => {
