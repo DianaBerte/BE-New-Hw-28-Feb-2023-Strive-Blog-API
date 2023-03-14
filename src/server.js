@@ -7,6 +7,7 @@ import { genericErrorHandler } from "./api/errorsHandlers.js";
 import filesRouter from "./files/index.js";
 import createHttpError from "http-errors";
 import { join } from 'path';
+import mongoose from "mongoose";
 
 const server = Express();
 const port = process.env.PORT || 3004
@@ -41,7 +42,12 @@ server.use("/files", filesRouter)
 //*******************************************error handlers*********************************************/
 server.use(genericErrorHandler);
 
-server.listen(port, () => {
-  console.table(listEndpoints(server));
-  console.log(`The server is running on port ${port}`);
-});
+mongoose.connect(process.env.MONGO_URL)
+
+mongoose.connection.on("Connected", () => {
+  console.log("Successfully connected to Mongo!")
+  server.listen(port, () => {
+    console.table(listEndpoints(server));
+    console.log(`The server is running on port ${port}`);
+  })
+})
