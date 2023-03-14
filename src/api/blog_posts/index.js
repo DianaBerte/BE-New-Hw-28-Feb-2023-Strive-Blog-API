@@ -136,28 +136,42 @@ blogPostsRouter.put("/:blogPostId", async (req, res, next) => {
   }
 })
 
-//5. DELETE
-blogPostsRouter.delete("/:blogpostId", async (req, res, next) => {
+//5. DELETE the old way
+// blogPostsRouter.delete("/:blogpostId", async (req, res, next) => {
+//   try {
+//     const blogPostsArray = await getBlogPosts();
+//     const remainingBlogPosts = blogPostsArray.filter(
+//       (blogPost) => blogPost.id !== req.params.blogpostId
+//     );
+//     if (blogPostsArray.length !== remainingBlogPosts.length) {
+//       writeBlogPosts(remainingBlogPosts);
+//       res.status(204).send();
+//     } else {
+//       next(
+//         createHttpError(
+//           404,
+//           `Blog post with id ${req.params.blogpostId} was not found!`
+//         )
+//       );
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+//5. DELETE the MONGO way
+blogPostsRouter.delete("/:blogPostId", async (req, res, next) => {
   try {
-    const blogPostsArray = await getBlogPosts();
-    const remainingBlogPosts = blogPostsArray.filter(
-      (blogPost) => blogPost.id !== req.params.blogpostId
-    );
-    if (blogPostsArray.length !== remainingBlogPosts.length) {
-      writeBlogPosts(remainingBlogPosts);
-      res.status(204).send();
+    const deletedBlogPost = await blogPostsModel.findByIdAndDelete(req.params.blogPostId)
+    if (deletedBlogPost) {
+      res.status(204).send()
     } else {
-      next(
-        createHttpError(
-          404,
-          `Blog post with id ${req.params.blogpostId} was not found!`
-        )
-      );
+      next(createHttpError(404, `Blog post with id ${req.params.blogPostId} not found :(`))
     }
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 //endpoint for exporting a CSV file for blog posts
 // blogPostsRouter.get("/blogPostsCSV", (req, res, next) => {
