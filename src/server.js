@@ -17,7 +17,7 @@ const publicFolderPath = join(process.cwd(), "./public")
 
 //*****************************************cors*****************************************/
 
-const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
+const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL, process.env.MONGO_URL]
 
 server.use(Express.static(publicFolderPath))
 server.use(
