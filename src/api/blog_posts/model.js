@@ -1,6 +1,19 @@
 import mongoose from "mongoose";
+import commentsModel from "../comments/model.js";
 
 const { Schema, model } = mongoose
+
+const CommentSchema = new Schema(
+    {
+        author: {
+            name: { type: String },
+        },
+        text: { type: String },
+    },
+    {
+        timestamps: true,
+    }
+);
 
 const blogPostSchema = new Schema(
     {
@@ -14,6 +27,7 @@ const blogPostSchema = new Schema(
             "name": { type: String, required: true },
         },
         "content": { type: String },
+        "comments": [CommentSchema],
     },
     {
         timestamps: true,

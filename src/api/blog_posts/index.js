@@ -8,6 +8,7 @@ import { getBlogPosts, writeBlogPosts, getBlogPostsJSONReadableStream } from "..
 import { Transform } from "@json2csv/node";
 import blogPostsModel from "./model.js";
 import commentsModel from "../comments/model.js";
+import mongoose from "mongoose";
 
 const blogPostsRouter = Express.Router();
 
@@ -193,32 +194,17 @@ blogPostsRouter.delete("/:blogPostId", async (req, res, next) => {
 //POST /blogPosts/:id
 blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
   try {
-    // We could receive here a blogPostId in the req.body. Given that id, we would like to insert the corresponding comment into the commentsArray of the specified blog post
+    const blogPost = await blogPostsModel.findById(req.params.blogPostId);
 
-    // 1. Search in the comments' collection for the comment by id
-    const addedComment = await commentsModel.findById(req.body.commentId, { _id: 0 })
-
-    if (addedComment) {
-      // 2. If the blog post is found --> let's add additional info like commentDate
-      const commentToInsert = { ...addedComment.toObject(), commentDate: new Date() }
-      console.log("Comment to insert:", commentToInsert)
-
-      // 3. Update the specified blog post record by adding that comment to the blog post's comments array
-      const updatedBlogPost = await blogPostsModel.findByIdAndUpdate(
-        req.params.blogPostId, //who
-        { $push: { comments: commentToInsert } }, //how
-        { new: true, runValidators: true } //options
+    if (!blogPost) {
+      return next(
+        createHttpError(404 `blogpost ${req.params.blogPostId} not found`)
       )
-      if (updatedBlogPost) {
-        res.send(updatedBlogPost)
-      } else {
-        next(createHttpError(404, `Blog post with it ${req.params.blogPostId} not found! :(`))
-      }
-    } else {
-      // 4. In case of comment not found  --> 404
-      next(createHttpError(404, `Comment with id ${req.body.commentId} not found! :(`))
-      console.log("Added comment:", addedComment)
     }
+    const newComment = { title: req.body.title, content: req.body.content, createdAt: new Date(), _id: new mongoose.Types.ObjectId(), };
+    blogPost.comments.push(newComment);
+    const { _id } = await blogPost.save();
+    res.status(201).send({ _id })
   } catch (error) {
     next(error)
   }
