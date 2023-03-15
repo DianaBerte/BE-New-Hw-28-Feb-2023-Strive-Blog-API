@@ -233,4 +233,17 @@ blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
   }
 })
 
+blogPostsRouter.get("/:blogPostId/comments/", async (req, res, next) => {
+  try {
+    const blogPosts = await blogPostsModel.findById(req.params.blogPostId)
+    if (blogPosts) {
+      res.send(blogPosts.comments)
+    } else {
+      next(createHttpError(404, `Comment with id ${req.params.commentId} not found :(`))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
 export default blogPostsRouter;
