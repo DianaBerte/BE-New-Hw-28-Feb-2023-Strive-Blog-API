@@ -192,19 +192,42 @@ blogPostsRouter.delete("/:blogPostId", async (req, res, next) => {
 
 // ********************************************** EMBEDDED CRUD **************************************************
 //POST /blogPosts/:id
+// blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
+//   try {
+//     const blogPost = await blogPostsModel.findById(req.params.blogPostId);
+
+//     if (!blogPost) {
+//       return next(
+//         createHttpError(404 `blogpost ${req.params.blogPostId} not found`)
+//       )
+//     }
+//     const newComment = { title: req.body.title, content: req.body.content, createdAt: new Date(), _id: new mongoose.Types.ObjectId(), };
+//     blogPost.comments.push(newComment);
+//     const { _id } = await blogPost.save();
+//     res.status(201).send({ _id })
+//   } catch (error) {
+//     next(error)
+//   }
+// })
+
 blogPostsRouter.post("/:blogPostId/comments", async (req, res, next) => {
   try {
-    const blogPost = await blogPostsModel.findById(req.params.blogPostId);
-
-    if (!blogPost) {
-      return next(
-        createHttpError(404 `blogpost ${req.params.blogPostId} not found`)
+    const blogPost = await blogPostsModel.findById(req.params.blogPostId)
+    if (blogPost) {
+      const newComment = { ...req.body, createdAt: new Date(), updatedAt: new Date() }
+      const updatedBlogPost = await blogPostsModel.findByIdAndUpdate(
+        req.params.blogPostId,
+        { $push: { comments: newComment } },
+        { new: true, runValidators: true }
       )
+      if (updatedBlogPost) {
+        res.send(newComment)
+      } else {
+        next(createHttpError(404, `Blog post with id ${req.params.blogPostId} not found :(`))
+      }
+    } else {
+      next(createHttpError(404, `Comment with id ${req.params.commentId} not found :(`))
     }
-    const newComment = { title: req.body.title, content: req.body.content, createdAt: new Date(), _id: new mongoose.Types.ObjectId(), };
-    blogPost.comments.push(newComment);
-    const { _id } = await blogPost.save();
-    res.status(201).send({ _id })
   } catch (error) {
     next(error)
   }
