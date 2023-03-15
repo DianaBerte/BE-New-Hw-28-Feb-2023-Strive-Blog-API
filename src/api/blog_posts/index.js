@@ -266,6 +266,27 @@ blogPostsRouter.get("/:blogPostId/comments/:commentId", async (req, res, next) =
   }
 })
 
+blogPostsRouter.put("/:blogPostId/comments/:commentId", async (req, res, next) => {
+  try {
+    const bp = await blogPostsModel.findById(req.params.blogPostId)
+    if (bp) {
+      const index = bp.comments.findIndex(comment => comment._id.toString() === req.params.commentId)
+
+      if (index !== -1) {
+        bp.comments[index] = { ...bp.comments[index].toObject(), ...req.bp }
+        await bp.save()
+        res.send(bp)
+      } else {
+        next(createHttpError(404, `Comment with id ${req.params.commentId} not found :(`))
+      }
+    } else {
+      next(createHttpError(404, `Blog post with id ${req.params.blogPostId} not found :(`))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
 blogPostsRouter.delete("/:blogPostId/comments/:commentId", async (req, res, next) => {
   try {
     const updatedBlogPost = await blogPostsModel.findByIdAndUpdate(
