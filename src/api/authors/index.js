@@ -26,27 +26,36 @@ console.log(
   join(dirname(fileURLToPath(import.meta.url)), "users.json")
 );
 
-//1
-authorsRouter.post("/", (req, res) => {
-  //1 read request body
-  //   console.log("Request body:", req.body);
-  //2 add some info
-  const newAuthor = {
-    ...req.body,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    id: uniqid(),
-  };
-  //3 save new author into author.json file
-  const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
-  authorsArray.push(newAuthor);
-  fs.writeFileSync(authorsJSONPath, JSON.stringify(authorsArray));
-  //4 send back a proper response
-  res.status(201).send({ id: newAuthor.id });
+// //1
+// authorsRouter.post("/", (req, res) => {
+//   //1 read request body
+//   //   console.log("Request body:", req.body);
+//   //2 add some info
+//   const newAuthor = {
+//     ...req.body,
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//     id: uniqid(),
+//   };
+//   //3 save new author into author.json file
+//   const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
+//   authorsArray.push(newAuthor);
+//   fs.writeFileSync(authorsJSONPath, JSON.stringify(authorsArray));
+//   //4 send back a proper response
+//   res.status(201).send({ id: newAuthor.id });
 
-  //   console.log("This is new author:", newAuthor);
-  //   res.send({ message: "I am the POST ENDPOINT" });
-});
+//   //   console.log("This is new author:", newAuthor);
+//   //   res.send({ message: "I am the POST ENDPOINT" });
+// });
+
+//1. POST THE MONGO WAY:
+authorsRouter.post("/", async (req, res, next) => {
+  try {
+    const newAuthor = new
+  } catch (error) {
+
+  }
+})
 
 //2
 // authorsRouter.get("/", (req, res) => {
