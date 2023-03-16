@@ -47,7 +47,7 @@ blogPostsRouter.post("/", async (req, res, next) => {
 //2. GET the MONGO way
 blogPostsRouter.get("/", async (req, res, next) => {
   try {
-    const blogPosts = await blogPostsModel.find()
+    const blogPosts = await blogPostsModel.find().populate({ path: "authors", select: "firstName lastName" })
     res.send(blogPosts)
   } catch (error) {
     next(error)
