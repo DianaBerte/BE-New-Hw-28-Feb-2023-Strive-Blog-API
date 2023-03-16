@@ -22,9 +22,7 @@ const blogPostSchema = new Schema(
             "value": { type: Number },
             "unit": { type: String },
         },
-        "author": {
-            "name": { type: String, required: true },
-        },
+        "authors": [{ type: Schema.Types.ObjectId, ref: "Author" }],
         "content": { type: String },
         "comments": [CommentSchema],
     },
