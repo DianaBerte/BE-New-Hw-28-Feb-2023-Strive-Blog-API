@@ -135,21 +135,35 @@ authorsRouter.put("/:authorId", async (req, res, next) => {
   }
 })
 
-//5
-authorsRouter.delete("/:userId", (req, res) => {
-  const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
-  const remainingAuthors = authorsArray.filter(
-    (author) => author.id !== req.params.userId
-  );
-  fs.writeFileSync(authorsJSONPath, JSON.stringify(remainingAuthors));
-  res.status(204).send();
-});
+//5 delete the old way
+// authorsRouter.delete("/:userId", (req, res) => {
+//   const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
+//   const remainingAuthors = authorsArray.filter(
+//     (author) => author.id !== req.params.userId
+//   );
+//   fs.writeFileSync(authorsJSONPath, JSON.stringify(remainingAuthors));
+//   res.status(204).send();
+// });
 
-authorsRouter.post("/register", async (req, res, next) => {
+// authorsRouter.post("/register", async (req, res, next) => {
+//   try {
+//     const { email } = req.body
+//     await sendsRegistrationEmail(email)
+//     res.send()
+//   } catch (error) {
+//     next(error)
+//   }
+// })y
+
+//5. DELETE the MONGO way
+authorsRouter.delete("/:authorId", async (req, res, next) => {
   try {
-    const { email } = req.body
-    await sendsRegistrationEmail(email)
-    res.send()
+    const deletedAuthor = await AuthorsModel.findByIdAndDelete(req.params.authorId)
+    if (deletedAuthor) {
+      res.status(204).send()
+    } else {
+      next(createHttpError(404, `Author with id ${req.params.authorId} not found :(`))
+    }
   } catch (error) {
     next(error)
   }
