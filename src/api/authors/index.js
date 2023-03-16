@@ -103,19 +103,37 @@ authorsRouter.get("/:authorId", async (req, res, next) => {
   }
 })
 
-//4
-authorsRouter.put("/:userId", (req, res) => {
-  const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
-  const index = authorsArray.findIndex(
-    (author) => author.id === req.params.userId
-  );
-  const oldAuthor = authorsArray[index];
-  const updatedAuthor = { ...oldAuthor, ...req.body, updatedAt: new Date() };
-  authorsArray[index] = updatedAuthor;
+//4. PUT the old way
+// authorsRouter.put("/:userId", (req, res) => {
+//   const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
+//   const index = authorsArray.findIndex(
+//     (author) => author.id === req.params.userId
+//   );
+//   const oldAuthor = authorsArray[index];
+//   const updatedAuthor = { ...oldAuthor, ...req.body, updatedAt: new Date() };
+//   authorsArray[index] = updatedAuthor;
 
-  fs.writeFileSync(authorsJSONPath, JSON.stringify(authorsArray));
-  res.send(updatedAuthor);
-});
+//   fs.writeFileSync(authorsJSONPath, JSON.stringify(authorsArray));
+//   res.send(updatedAuthor);
+// });
+
+//4. PUT the MONGO way
+authorsRouter.put("/:authorId", async (req, res, next) => {
+  try {
+    const updatedAuthor = await AuthorsModel.findByIdAndUpdate(
+      req.params.authorId,
+      req.body,
+      { new: true, runValidators: true }
+    )
+    if (updatedAuthor) {
+      res.send(updatedAuthor)
+    } else {
+      next(createHttpError(404, `Author with id ${req.params.authorId} not found :(`))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
 
 //5
 authorsRouter.delete("/:userId", (req, res) => {
