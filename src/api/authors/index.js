@@ -13,6 +13,7 @@ import { dirname, join } from "path";
 import uniqid from "uniqid";
 import { getAuthors, writeAuthors } from "../../lib/fs-tools.js";
 import { sendsRegistrationEmail } from "../../lib/email-tools.js";
+import AuthorsModel from "./model.js";
 
 const authorsRouter = Express.Router();
 
@@ -51,9 +52,11 @@ console.log(
 //1. POST THE MONGO WAY:
 authorsRouter.post("/", async (req, res, next) => {
   try {
-    const newAuthor = new
+    const newAuthor = new AuthorsModel(req.body)
+    const { _id } = await newAuthor.save()
+    res.status(201).send({ _id })
   } catch (error) {
-
+    next(error)
   }
 })
 
@@ -69,10 +72,14 @@ authorsRouter.post("/", async (req, res, next) => {
 //   res.send(authorsArray);
 // });
 
-//refactoring GET
-authorsRouter.get("/", async (req, res) => {
-  const authors = await getAuthors();
-  res.send(authors)
+//2. GET the MONGO way
+authorsRouter.get("/", async (req, res, next) => {
+  try {
+    const authors = await AuthorsModel.find()
+    res.send(authors)
+  } catch (error) {
+    next(error)
+  }
 })
 
 //3
