@@ -82,12 +82,26 @@ authorsRouter.get("/", async (req, res, next) => {
   }
 })
 
-//3
-authorsRouter.get("/:userId", (req, res) => {
-  const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
-  const author = authorsArray.find((author) => author.id === req.params.userId);
-  res.send(author);
-});
+//3. GET with id the old way
+// authorsRouter.get("/:userId", (req, res) => {
+//   const authorsArray = JSON.parse(fs.readFileSync(authorsJSONPath));
+//   const author = authorsArray.find((author) => author.id === req.params.userId);
+//   res.send(author);
+// });
+
+//3. GET WITH ID the MONGO way
+authorsRouter.get("/:authorId", async (req, res, next) => {
+  try {
+    const author = await AuthorsModel.findById(req.params.authorId)
+    if (author) {
+      res.send(author)
+    } else {
+      next(createHttpError(404, `Author with id ${req.params.authorId} not found :(`))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
 
 //4
 authorsRouter.put("/:userId", (req, res) => {

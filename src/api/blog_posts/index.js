@@ -54,7 +54,7 @@ blogPostsRouter.get("/", async (req, res, next) => {
   }
 })
 
-//3. GET WITH ID the lod way
+//3. GET WITH ID the old way
 // blogPostsRouter.get("/:blogpostId", async (req, res, next) => {
 //   try {
 //     const blogPostsArray = await getBlogPosts();
