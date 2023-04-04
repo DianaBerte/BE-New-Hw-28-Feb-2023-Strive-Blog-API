@@ -70,7 +70,7 @@ authorsRouter.post("/", async (req, res, next) => {
 // });
 
 //2. GET the MONGO way
-authorsRouter.get("/", basicAuthenticationMiddleware, adminOnlyMiddleware, async (req, res, next) => {
+authorsRouter.get("/", basicAuthenticationMiddleware, async (req, res, next) => {
   try {
     const authors = await AuthorsModel.find({})
     res.send(authors)
