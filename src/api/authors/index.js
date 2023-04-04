@@ -1,9 +1,3 @@
-//1. POST --> http://localhost:3001/authors/ => (+ body) create a new author
-//2. GET --> http://localhost:3001/authors/ => returns the list of authors
-//3. GET (sg user) --> http://localhost:3001/authors/:userId => returns a single author
-//4. PUT --> http://localhost:3001/authors/:userId => edit the author with the given id
-//5. DELETE --> http://localhost:3001/authors/:userId => delete the author with the given id
-
 //POST /authors/:id/uploadAvatar, uploads a picture (save as idOfTheAuthor.jpg in the public/img/authors folder) for the author specified by the id. Store the newly created URL into the corresponding author in authors.json
 
 import Express from "express";
@@ -14,6 +8,9 @@ import uniqid from "uniqid";
 import { getAuthors, writeAuthors } from "../../lib/fs-tools.js";
 import { sendsRegistrationEmail } from "../../lib/email-tools.js";
 import AuthorsModel from "./model.js";
+import createHttpError from "http-errors";
+import { basicAuthenticationMiddleware } from "../../lib/auth/basic.js";
+import { adminOnlyMiddleware } from "../../lib/auth/admin.js";
 
 const authorsRouter = Express.Router();
 
@@ -73,10 +70,27 @@ authorsRouter.post("/", async (req, res, next) => {
 // });
 
 //2. GET the MONGO way
-authorsRouter.get("/", async (req, res, next) => {
+authorsRouter.get("/", basicAuthenticationMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
-    const authors = await AuthorsModel.find()
+    const authors = await AuthorsModel.find({})
     res.send(authors)
+  } catch (error) {
+    next(error)
+  }
+})
+
+authorsRouter.get("/me", basicAuthenticationMiddleware, async (req, res, next) => {
+  try {
+    res.send(req.author)
+  } catch (error) {
+    next(error)
+  }
+})
+
+authorsRouter.put("/me", basicAuthenticationMiddleware, async (req, res, next) => {
+  try {
+    const updatedAuthor = await AuthorsModel.findByIdAndUpdate(req.author._id, req.body, { new: true, runValidators: true })
+    res.send(updatedAuthor)
   } catch (error) {
     next(error)
   }
@@ -90,7 +104,7 @@ authorsRouter.get("/", async (req, res, next) => {
 // });
 
 //3. GET WITH ID the MONGO way
-authorsRouter.get("/:authorId", async (req, res, next) => {
+authorsRouter.get("/:authorId", basicAuthenticationMiddleware, async (req, res, next) => {
   try {
     const author = await AuthorsModel.findById(req.params.authorId)
     if (author) {
@@ -118,7 +132,7 @@ authorsRouter.get("/:authorId", async (req, res, next) => {
 // });
 
 //4. PUT the MONGO way
-authorsRouter.put("/:authorId", async (req, res, next) => {
+authorsRouter.put("/:authorId", basicAuthenticationMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
     const updatedAuthor = await AuthorsModel.findByIdAndUpdate(
       req.params.authorId,
@@ -156,7 +170,7 @@ authorsRouter.put("/:authorId", async (req, res, next) => {
 // })y
 
 //5. DELETE the MONGO way
-authorsRouter.delete("/:authorId", async (req, res, next) => {
+authorsRouter.delete("/:authorId", basicAuthenticationMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
     const deletedAuthor = await AuthorsModel.findByIdAndDelete(req.params.authorId)
     if (deletedAuthor) {

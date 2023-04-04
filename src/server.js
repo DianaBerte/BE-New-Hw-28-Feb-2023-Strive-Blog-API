@@ -3,7 +3,8 @@ import authorsRouter from "./api/authors/index.js";
 import listEndpoints from "express-list-endpoints";
 import blogPostsRouter from "./api/blog_posts/index.js";
 import cors from "cors";
-import { genericErrorHandler } from "./api/errorsHandlers.js";
+// import { genericErrorHandler } from "./api/errorsHandlers.js";
+import { forbiddenErrorHandler, genericErroHandler, notFoundErrorHandler, unauthorizedErrorHandler } from "./errorHandlers.js";
 import filesRouter from "./files/index.js";
 import createHttpError from "http-errors";
 import { join } from 'path';
@@ -40,7 +41,10 @@ server.use("/blogposts", blogPostsRouter);
 server.use("/files", filesRouter)
 
 //*******************************************error handlers*********************************************/
-server.use(genericErrorHandler);
+server.use(unauthorizedErrorHandler)
+server.use(forbiddenErrorHandler)
+server.use(notFoundErrorHandler)
+server.use(genericErroHandler)
 
 mongoose.connect(process.env.MONGO_URL)
 
