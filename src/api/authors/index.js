@@ -1,17 +1,14 @@
 import Express from "express";
-import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import uniqid from "uniqid";
-import { getAuthors, writeAuthors } from "../../lib/fs-tools.js";
-import { sendsRegistrationEmail } from "../../lib/email-tools.js";
-import AuthorsModel from "./model.js";
 import createHttpError from "http-errors";
 import { basicAuthenticationMiddleware } from "../../lib/auth/basic.js";
+import AuthorsModel from "./model.js";
 import { adminOnlyMiddleware } from "../../lib/auth/admin.js";
+import { createAccessToken } from "../../lib/auth/tools.js";
+import { JWTAuthMiddleware } from "../../lib/auth/jwt.js";
 
 const authorsRouter = Express.Router();
-
 
 const authorsJSONPath = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -32,7 +29,7 @@ authorsRouter.post("/", async (req, res, next) => {
   }
 })
 
-authorsRouter.get("/", basicAuthenticationMiddleware, async (req, res, next) => {
+authorsRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const authors = await AuthorsModel.find({})
     res.send(authors)
@@ -41,9 +38,10 @@ authorsRouter.get("/", basicAuthenticationMiddleware, async (req, res, next) => 
   }
 })
 
-authorsRouter.get("/me", basicAuthenticationMiddleware, async (req, res, next) => {
+authorsRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
   try {
-    res.send(req.author)
+    const author = await AuthorsModel.findById(req.author._id)
+    res.send(author)
   } catch (error) {
     next(error)
   }
@@ -95,6 +93,24 @@ authorsRouter.delete("/:authorId", basicAuthenticationMiddleware, adminOnlyMiddl
       res.status(204).send()
     } else {
       next(createHttpError(404, `Author with id ${req.params.authorId} not found :(`))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
+authorsRouter.post("/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body
+    const author = await AuthorsModel.checkCredentials(email, password)
+
+    if (author) {
+      const payload = { _id: author._id, role: author.role }
+      const accessToken = await createAccessToken(payload)
+
+      res.send({ accessToken })
+    } else {
+      next(createHttpError(401, "Credentials are invalid."))
     }
   } catch (error) {
     next(error)
