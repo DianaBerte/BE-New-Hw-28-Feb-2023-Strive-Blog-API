@@ -12,6 +12,7 @@ import mongoose from "mongoose";
 import { basicAuthenticationMiddleware } from "../../lib/auth/basic.js";
 import { adminOnlyMiddleware } from "../../lib/auth/admin.js";
 import AuthorsModel from "../authors/model.js"
+import { JWTAuthMiddleware } from "../../lib/auth/jwt.js";
 
 
 const blogPostsRouter = Express.Router();
@@ -31,19 +32,14 @@ const blogPostsRouter = Express.Router();
 //   res.status(201).send({ id: newBlogPost.id });
 // });
 
-//1. POST the MONGO way
-blogPostsRouter.post("/", basicAuthenticationMiddleware, async (req, res, next) => {
+
+blogPostsRouter.post("/", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const newBlogPost = new blogPostsModel(req.body);
-    const authorOfPost = new AuthorsModel.findById(req.body.author.authorId)
-
-    if (!authorOfPost !== undefined) {
-      const { _id } = await newBlogPost.save();
-      await AuthorsModel.findByIdAndUpdate(req.body.author.authorId, { $push: { blogPosts: _id } }, { new: true, runValidators: true }),
-        res.status(201).send({ _id })
-    } else {
-      res.status(404).send("Author not found!")
-    }
+    newBlogPost.authors = [...newBlogPost.authors, req.user._id]
+    const { _id } = await newBlogPost.save()
+    res.status(201).send({ _id })
+    res.status(404).send("Author not found!")
   } catch (error) {
     next(error)
   }
@@ -60,6 +56,17 @@ blogPostsRouter.get("/", async (req, res, next) => {
   try {
     const blogPosts = await blogPostsModel.find().populate({ path: "authors", select: "firstName lastName" })
     res.send(blogPosts)
+  } catch (error) {
+    next(error)
+  }
+})
+
+blogPostsRouter.get("/me/stories", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    const posts = await blogPostsModel.find({
+      authors: { $in: [req.user._id] }
+    }).populate('authors')
+    res.send(posts)
   } catch (error) {
     next(error)
   }
