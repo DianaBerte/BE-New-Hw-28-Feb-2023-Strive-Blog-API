@@ -9,7 +9,8 @@ const authorSchema = new Schema(
         lastName: { type: String, required: true },
         email: { type: String, required: true },
         password: { type: String, required: true },
-        role: { type: String, required: true, enum: ["Admin", "Author"], default: "Author" },
+        role: { type: String, required: true, enum: ["Admin", "User"], default: "User" },
+        blogPosts: [{ type: Schema.Types.ObjectId, ref: "BlogPost" }]
     },
     { timestamps: true }
 )

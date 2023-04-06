@@ -19,7 +19,7 @@ console.log(
   join(dirname(fileURLToPath(import.meta.url)), "users.json")
 );
 
-authorsRouter.post("/", async (req, res, next) => {
+authorsRouter.post("/register", async (req, res, next) => {
   try {
     const newAuthor = new AuthorsModel(req.body)
     const { _id } = await newAuthor.save()
@@ -40,14 +40,14 @@ authorsRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
 
 authorsRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
   try {
-    const author = await AuthorsModel.findById(req.author._id)
+    const author = await AuthorsModel.findById(req.user._id)
     res.send(author)
   } catch (error) {
     next(error)
   }
 })
 
-authorsRouter.put("/me", basicAuthenticationMiddleware, async (req, res, next) => {
+authorsRouter.put("/me", async (req, res, next) => {
   try {
     const updatedAuthor = await AuthorsModel.findByIdAndUpdate(req.author._id, req.body, { new: true, runValidators: true })
     res.send(updatedAuthor)
@@ -56,9 +56,9 @@ authorsRouter.put("/me", basicAuthenticationMiddleware, async (req, res, next) =
   }
 })
 
-authorsRouter.get("/:authorId", basicAuthenticationMiddleware, async (req, res, next) => {
+authorsRouter.get("/:authorId", JWTAuthMiddleware, async (req, res, next) => {
   try {
-    const author = await AuthorsModel.findById(req.params.authorId)
+    const author = await AuthorsModel.findById(req.params.authorId).populate({ path: "blogPosts", select: "title" })
     if (author) {
       res.send(author)
     } else {
@@ -69,7 +69,7 @@ authorsRouter.get("/:authorId", basicAuthenticationMiddleware, async (req, res, 
   }
 })
 
-authorsRouter.put("/:authorId", basicAuthenticationMiddleware, adminOnlyMiddleware, async (req, res, next) => {
+authorsRouter.put("/:authorId", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
     const updatedAuthor = await AuthorsModel.findByIdAndUpdate(
       req.params.authorId,
@@ -86,7 +86,7 @@ authorsRouter.put("/:authorId", basicAuthenticationMiddleware, adminOnlyMiddlewa
   }
 })
 
-authorsRouter.delete("/:authorId", basicAuthenticationMiddleware, adminOnlyMiddleware, async (req, res, next) => {
+authorsRouter.delete("/:authorId", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
     const deletedAuthor = await AuthorsModel.findByIdAndDelete(req.params.authorId)
     if (deletedAuthor) {

@@ -9,6 +9,10 @@ import { Transform } from "@json2csv/node";
 import blogPostsModel from "./model.js";
 import commentsModel from "../comments/model.js";
 import mongoose from "mongoose";
+import { basicAuthenticationMiddleware } from "../../lib/auth/basic.js";
+import { adminOnlyMiddleware } from "../../lib/auth/admin.js";
+import AuthorsModel from "../authors/model.js"
+
 
 const blogPostsRouter = Express.Router();
 
@@ -28,11 +32,18 @@ const blogPostsRouter = Express.Router();
 // });
 
 //1. POST the MONGO way
-blogPostsRouter.post("/", async (req, res, next) => {
+blogPostsRouter.post("/", basicAuthenticationMiddleware, async (req, res, next) => {
   try {
-    const newBlogPost = new blogPostsModel(req.body)
-    const { _id } = await newBlogPost.save()
-    res.status(201).send({ _id })
+    const newBlogPost = new blogPostsModel(req.body);
+    const authorOfPost = new AuthorsModel.findById(req.body.author.authorId)
+
+    if (!authorOfPost !== undefined) {
+      const { _id } = await newBlogPost.save();
+      await AuthorsModel.findByIdAndUpdate(req.body.author.authorId, { $push: { blogPosts: _id } }, { new: true, runValidators: true }),
+        res.status(201).send({ _id })
+    } else {
+      res.status(404).send("Author not found!")
+    }
   } catch (error) {
     next(error)
   }
